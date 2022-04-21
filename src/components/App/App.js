@@ -1,11 +1,11 @@
 import "./App.css";
-import Header from "./components/Header/Header";
+import Header from "../Header/Header";
 
 function App() {
   const name = "Acme";
   return (
     <div className="App">
-      <Header companyName={name} />
+      <Header companyName={name} title="hard coded" />
     </div>
   );
 }

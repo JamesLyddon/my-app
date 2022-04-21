@@ -146,7 +146,7 @@ The way we pass props to component is to include them like attributes in the hig
 
 
 
-The prop could be called anything and we don't need to assign a variable first to pass into a prop like we have here.
+The prop could be called anything we want and we don't need to assign a variable first to pass into a prop like we have here.
 
 
 So far we've passed the name variable as a prop to our Header component but we haven't made use of it in any way. To do that we go to our Header.js, include props as an argument of the function, then reference it as a piece of JavaScript in our JSX e.g.
@@ -161,6 +161,9 @@ So far we've passed the name variable as a prop to our Header component but we h
     }
 
 
+We don't need to call the argument passed in props but it is the standard convention. If we had passed in as (bill) then we would access the prop we want as {bill.companyName}.
+
+
 We can also use destructuring to make this cleaner, eliminating the need to use the props prefix e.g.
 
     export default function Header({ companyName }) {
@@ -172,7 +175,55 @@ We can also use destructuring to make this cleaner, eliminating the need to use 
         );
     }
 
+With destructuring the name passed into the argument must EXACTLY match the name we passed into the component in the parent.
 
-Props can be passed down the chain/tree of components from parent to child in this way, like a human chain passing buckets of water. We can even pass functions down as props, not just properties.
+
+We can pass as many props as we like down, for example lets also pass down a title to Header
+
+    export default function App() {
+        const name = "Acme";
+        return (
+            <div className="App">
+            <Header companyName={name} title="hard coded" />
+            </div>
+        );
+    }
+
+
+Now say we don't want to use this in our Header but instead in our Nav, we simply pass it down another level where we use the Nav component in our Header component
+
+    export default function Header(props) {
+        let title = props.title;
+            return (
+                <header className="masthead">
+                <h1>{props.companyName}</h1>
+                <Nav title={title}/>
+                </header>
+            );
+    }
+
+
+Then we can make use of the prop.title, that was passed from App to Header then from Header to Nav, inside our Nav component
+
+    import "./nav.css";
+
+    export default function Nav(props) {
+        return <nav>{props.title}</nav>;
+    }
+
+The prop didn't need to have the same name as it started with in App, we could have passed it down to Nav in the Header component with a different name (e.g. let ttl = props.title) but it helps to be consistent.
+
+Props can be passed down the chain/tree of components from parent to child in this way, like a human chain passing buckets of water. For example we could pass the props Header has received down to <Nav />
+
+
+You may be wondering 'what if we want to pass a property up the component tree?'. We will cover this later but essentially we can define a property and a function that sets it in the top component (say App for example) and we can then pass the setter function down as a prop. The child component can then use the function to alter the property living in the top component. This will become more clear when we start working with the useState() Hook.
+
+
+As a final note we can also move our App.js, app.cs, and App.test.js into an App file in our components folder to be consistent. Just remember to change the import locations to reflect this, including the App import in src\index.js (e.g. import App from "./components/App/App";)
+
+
+---------------------------------------------------------------------------------------------------------
+04 COMPONENTS FROM DATA
+---------------------------------------------------------------------------------------------------------
 
 

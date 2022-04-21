@@ -1,5 +1,5 @@
 import "./nav.css";
 
-export default function Nav() {
-  return <nav>links here</nav>;
+export default function Nav(props) {
+  return <nav>{props.title}</nav>;
 }

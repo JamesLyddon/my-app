@@ -1,11 +1,12 @@
 import "./header.css";
 import Nav from "../Nav/Nav";
 
-export default function Header({ companyName }) {
+export default function Header(props) {
+  let title = props.title;
   return (
     <header className="masthead">
-      <h1>{companyName}</h1>
-      <Nav />
+      <h1>{props.companyName}</h1>
+      <Nav title={title}/>
     </header>
   );
 }
