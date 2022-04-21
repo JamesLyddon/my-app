@@ -265,3 +265,70 @@ To summarise, when we want to generate components programatically we need to map
 05 Adding Events
 ---------------------------------------------------------------------------------------------------------
 
+
+We're used to adding event logic by querySelecting an html element in JavaScript and adding an event listener to it e.g. menuButton.addEventListener('click', () => {...}) etc.
+
+Synthetic Events Reference --> https://reactjs.org/docs/events.html
+
+With React we use 'Synthetic Events'. These are React events that are returned instead of the browser's native events, so instead of the mouseout event we work with onMouseLeave in React. The Synthetic Events have all the same properties as the native events (e.g. preventDefault(), bubbles, type, etc.).
+
+Instead of adding event listeners to elements, in React we assign a function to an event by assigning it like an attribute to JSX elements. Instead of .addEventListener('click', ...) we instead do something like <div onClick={handleClick}></div> where handleClick() is a function we have already defined (usually inside the function component, before the return statement).
+
+It's important to know that these attribute like Syntetic Events have to go on JSX ELEMENTS, NOT COMPONENTS. This is becuase JSX elements are essentially HTML whereas Components are essentially JavaScript objects and can't have event handlers attached to them. So, in short, this wouldn't work --> <Link onClick={handleClick} /> but this would <div onClick={handleClick}><Link /></div>.
+
+Put another way, Synthetic Events have to be attached to things that will render to HTML, namely, JSX elements.
+
+We can enter the function like this onClick={doathing} or like this onClick={() => doathing()} or if we want the event onClick={(ev) => doathing(ev)}. 
+
+Here's an example of a simple form using synthetic events
+
+    export default function SearchBar(props) {
+        function submitted(ev) {
+            ev.preventDefault();
+            console.log("submitted");
+        }
+
+         function focused(ev) {
+            console.log("onFocus");
+        }
+
+        function changed(ev) {
+            console.log("onInput", ev.target.value);
+        }
+
+        function clicked(ev) {
+            console.log("clicked");
+        }
+
+    return (
+        <section className="searchBar">
+        <form onSubmit={submitted}>
+            <input
+            className="searchText"
+            type="text"
+            name="keyword"
+            placeholder="keyword"
+            onFocus={focused}
+            onInput={changed}
+            />
+            <button
+            className="searchBtn"
+            type="submit"
+            name="searchBtn"
+            onClick={clicked}
+            >
+            Search
+            </button>
+        </form>
+        </section>
+    );
+    }
+
+As you can see we have multiple functions defined at the top to handle multiple events. We then call those functions for the relevant events in the revelevant elements e.g. onClick for the button, onChange for the input etc.
+
+These will end up being utalised as a component but the synthetic events are on JSX elements.
+
+
+---------------------------------------------------------------------------------------------------------
+06 Hooks
+---------------------------------------------------------------------------------------------------------
