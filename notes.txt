@@ -1,0 +1,178 @@
+React 2021 Up and Running Notes
+---------------------------------------------------------------------------------------------------------
+01 SETTING UP
+---------------------------------------------------------------------------------------------------------
+
+
+public\index.html -->       src\index.js        -->             src\App.js
+(holds the root)      (renders <App /> in root)     (App component/Top of component tree)
+
+
+CREATE NEW REACT PROJECT --> npx create-react-app app-name
+
+
+BUILD PRODUCTION VERSION --> npm run BUILD
+    (this will be an optimised version of the project)
+
+
+START DEVELOPMENT SERVER --> npm start
+    (when running dev version you can view the components in dev tools)
+
+
+SERVE PRODUCTION VERSION FROM BUILD FOLDER --> npx serve -s build
+    (requires the installation of the serve package)
+    (can not view react component in dev tools)
+
+
+---------------------------------------------------------------------------------------------------------
+02 - WORKING WITH JSX
+---------------------------------------------------------------------------------------------------------
+
+
+In React we create modules/components that are each a function that returns a single object containing html. The basic way to do this would be to
+use React.createElement() to manually create each html element. Instead, we can use JSX to write html like code that we be converted by BABEL using
+React.createElement(). BABEL converts our JSX into an object that will contain html.
+
+
+Since our JSX will mostly span multiple line we want to be sure to add parenthesis after our return to avoidJavaScript's automatic semi-colon injection (end so return nothing/exit early). Everthing inside the parenthesis of return() will be treated as if it is on the same line as the return statement. If we used parenthesis {} then we would be returning an object which we don't want to do, we want to feed JSX to BABEL.
+
+
+Each component function can only return ONE JSX element. BABEL is expecting one to convert using React.createElement() and so there will be an error if it receives two. We can, however, have mulitple JSX elements nested inside a top level element that is being returned. The main thing is that there can only be ONE TOP LEVEL ELEMENT. This could be a <div>, a <main>, or a react fragment <></>.
+
+
+JSX is JavaScript not HTML so when we add attributes to JSX elements we have to remember to do so in the JavaScript way. Instead of adding class="", we would add className="". The pattern is camelCase.
+
+
+If we are using a simple string for an attribute we can pass it in with double quotes. If we want to pass in a variable we need to use parenthesis e.g. let appStyle = 'App'    className={appStyle}.
+
+
+In JSX we can 'escape' to pure JavaScript using parenthesis e.g. { return 2 + 2 }. Sometimes an attribute may be expecting an object and so if we want to hard code it there with JavaScript we actually need double parenthesis {{}} e.g. style={{color: 'green'}}
+
+
+---------------------------------------------------------------------------------------------------------
+03 COMPONENTS AND PROPS
+---------------------------------------------------------------------------------------------------------
+
+
+React is fundamentally about building an interface. The way we do this is not by creating the whole thing in one big file but instead by making many small pieces of the interface which we can then insert into our top level component, <App />.
+
+
+Before a class based approach was used but now the convention is to use functional components. Each component is it's own file that exports a function that returns JSX. Here's a bsic example:
+
+    export default function App() {
+        return (
+            <div>
+                ...
+            </div>
+    );
+    }
+
+
+The old class based approach made components like so:
+
+    import React from 'react'
+
+    export default class App extends React.Component{
+        constructor(props){
+            super(props)
+        }
+
+        render() {
+            return (
+                <div>
+                    ...
+                </div>
+            )
+        }
+    }
+
+
+Whether we want to use class or function components the important thing to know is that each component is it's own .js or .jsx file which another component (usually our top level App component) can import and use the html it returns (thanks to BABEL). So our top level component may end up looking something like this:
+
+    import "./App.css";
+    import Header from 'components/Header/Header';
+    import Main from 'components/Main/Main';
+    import Footer from 'components/Footer/Footer';
+
+    function App() {
+    return (
+        <div className="App">
+            <Header />
+            <Main />
+            <Footer />
+        </div>
+    );
+    }
+
+    export default App;
+
+
+So we simply import the component and insert them like lego blocks to make use of the html their function returns. Notice the convention of putting all components in their own folder inside a parent component folder (in src) and also every component is capitalised. We can also have a css file in each component folder to style each component individually.
+
+
+So the file structure would be:
+
+    \src
+        \components
+            \Header
+                Header.js
+                header.css
+            \Main
+                Main.js
+                main.css
+            \Footer
+                Footer.js
+                footer.css
+        App.js
+
+
+PROPS
+
+Props are properties that we can pass DOWN from one component to another but not up the tree e.g. we could pass a prop from App down to Header but we can't pass a prop from Header up to App.
+
+
+The way we pass props to component is to include them like attributes in the higher level component e.g. 
+
+    import Header from "./components/Header/Header";
+
+    export default function App() {
+    const name = "Acme";
+        return (
+            <div className="App">
+            <Header companyName={name} />
+            </div>
+        );
+    }
+
+
+
+The prop could be called anything and we don't need to assign a variable first to pass into a prop like we have here.
+
+
+So far we've passed the name variable as a prop to our Header component but we haven't made use of it in any way. To do that we go to our Header.js, include props as an argument of the function, then reference it as a piece of JavaScript in our JSX e.g.
+
+    export default function Header(props) {
+        return (
+            <header className="masthead">
+            <h1>{props.companyName}</h1>
+            <Nav />
+            </header>
+        );
+    }
+
+
+We can also use destructuring to make this cleaner, eliminating the need to use the props prefix e.g.
+
+    export default function Header({ companyName }) {
+        return (
+            <header className="masthead">
+            <h1>{companyName}</h1>
+            <Nav />
+            </header>
+        );
+    }
+
+
+Props can be passed down the chain/tree of components from parent to child in this way, like a human chain passing buckets of water. We can even pass functions down as props, not just properties.
+
+
