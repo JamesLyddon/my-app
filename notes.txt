@@ -227,3 +227,41 @@ As a final note we can also move our App.js, app.cs, and App.test.js into an App
 ---------------------------------------------------------------------------------------------------------
 
 
+We've seen creating components declaratively/manually but one of the most common things we'll want to do is take a list or array of data and create JSX/HTML/components from that list programatically. Typically, this will involve mapping over the data to return the data inside JSX elements.
+
+For this example lets say we have some data inside our Nav component that we want to display inside of a Link component. To do this we want to map over the data and return a Link component but we also want to pass the data a prop into the Link component. This allows us to include the data in our Link component. It might seems a little chicken and egg but we can flesh out the JSX of the Link component knowing that Nav will pass the data too it.
+
+    export default function Nav() {
+        const links = [
+            { title: "Films", url: "https://swapi.dev/api/films/" },
+            { title: "People", url: "https://swapi.dev/api/people/" },
+            { title: "Planets", url: "https://swapi.dev/api/planets/" },
+        ];
+
+        return (
+            <nav>
+            {links.map((item, idx) => (
+                <Link key={idx} data={item}/>
+            ))}
+            </nav>
+        );
+    }
+
+And then one step down the tree...
+
+    export default function Link({ data }) {
+        return <div>{data.title}</div>;
+    }
+
+As you can see I've chosen to destructure the props here. If I had simply passed props as an argument I could have accessed the title with props.data.title. Alternatively, if I know I only want the title and nothing else I could instead have only passed this is during the map e.g. title={item.title}, then inside of Link I can simply destructure ({ title }) and use it as { title }. However, this would mean if we also wanted the url we'd have to pass that as a seperate prop.
+
+Notice that when we map we can also chose to get access to the index. The reason I did this here is because I wanted to use it as each returned element's key property. But what is a key property? React doesn't have a way of knowing which element being returned by map is which. When React need to rerender it only wants to rerender what's absolutely necessary. Typically if the mapped out elements are in the same order and haven't changed then React can see this and will not rerender them but if we were to put a new element at the beginning or in the middle React will not be able to recognise any elements that are now in a different order and so will have to rerender them, wasting resources. By including a key attribute we help React recognise returned elements and avoid rerendering them unnecessarily; React can reconise previously rendered elements even when in a different order. This might not seem like a big deal but if you had an array of 10,000 objects everytime you inserted a new item React would have to rerender every item that has changed position in the array (so if you unshift an item in, all of them). For this reason we typically don't want to use index since it changes as the element moves in the array and would not avoid this rerendering. Instead we can use a 3rd party library like UUID to get unique keys for each element.
+
+
+To summarise, when we want to generate components programatically we need to map over the collection of data we want to use, return the component while passing the props we need into it, and finally give each returned item a unique key to help React be efficient with its rendering.
+
+
+---------------------------------------------------------------------------------------------------------
+05 Adding Events
+---------------------------------------------------------------------------------------------------------
+

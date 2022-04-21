@@ -2,10 +2,10 @@ import "./App.css";
 import Header from "../Header/Header";
 
 function App() {
-  const name = "Acme";
+  const name = "Company Name";
   return (
     <div className="App">
-      <Header companyName={name} title="hard coded" />
+      <Header company={name} />
     </div>
   );
 }
