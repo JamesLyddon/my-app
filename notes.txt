@@ -332,3 +332,110 @@ These will end up being utalised as a component but the synthetic events are on 
 ---------------------------------------------------------------------------------------------------------
 06 Hooks
 ---------------------------------------------------------------------------------------------------------
+
+
+Hooks are premade methods we can import from the React Library that can give our functional components super powers! They allow our functional components to 'hook into' state and lifecycle methods.
+
+
+When we used to use class based components we had the property this.state that we could use to store and update state in our components but we do not have this with functional components. Instead, we can use the useState Hook.
+
+To use the useState hook we first need to import it into our component from the react library
+
+    import {useState} from 'react';
+
+Now we call the useState function in our component. When we call this function it will return 2 objects, a property to store some state and a method to set the value of that property so we call the function and assign it to variables like so:
+
+    const [count, setCount] = useState(0)
+
+Notice that we can pass in the initial value we want the state to have as an argument, in this case 0. We can also leave this blank.
+
+Something to bare in mind that this does not represent a universal holder of state for our component like this.state did, instead you would make multiple states for multiple purposes e.g.
+
+    const [count, setCount] = useState(0)
+    const [name, setName] = useState('tim')
+    const [customer, setCustomer] = useState({id: 0, discountcode: '12', email: 'bill@ben.com'})
+
+Notice you can use useState with objects and arrays, not just simple data types.
+
+We can then use these state values in our JSX just like if we created a variable e.g. <h1>{name}</h1>
+
+If we want to change the value of a state dynamically we can do so using it's setX method e.g. count can be changed with setCount.
+
+Here's an example of changing a greeting state value using a button
+
+    <button
+        onClick={() => {
+            setGreeting("felicitations");
+        }}
+        >
+        change greeting
+    </button>
+
+We must always use this setter method to alter state and never attempt to alter it directly 
+e.g. greeting = 'new greeting'. This is becuase the setter method doesn't just change the state's value, it 'watches' for a change in that state and tells React to rerender when its state changes. When we attempt to modify the state directly React doesn't know it's changed.
+
+Here's an example of setting state on a form submit. Notice that we can access the relevant field inside the form using its name property (in this case keyword). Since this method is being called on submit the target is the form.
+
+    const [myprop, setMyProp] = useState("default value");
+
+    function submitted(ev) {
+        ev.preventDefault();
+        console.log("submitted");
+        setMyProp(ev.target["keyword"].value);
+    }
+
+So this would change the value of the myprop state to be whether is in the keyword input field when the user submits the form (calling this function).
+
+If a state (say term in this case) is an empty string then it will still be rendered if included like this <p>{term}</p>. We won't see anything on the page but if we don't want the paragraph to be rendered at all we can use a ternary to show it conditionally. This works because an empty string is falsey.
+
+    {term ? <p>You searched for {term}</p> : ""}
+
+So if term is not an empty string (truthy) it will render the paragraph and if term is empty (falsy) it will return an empty string. This empty string is not in a paragraph element like the empty string from term was before so it will not be rendered, it effectively returns nothing.
+
+Something to know is a ternary returns an expression conditionally and does not control the flow of your program, for that stick to if statements.
+
+If we only want to use state inside the component we declare it in then there's no problem with that. However, just like props, state cannot be passed up the tree, only down, and so we need to make sure we declare state high enough for all the components we want to have access to it. We can then pass down the setter function as a prop and child components can alter state of higher/parent components.
+
+Let's suppose we want <SearchBar /> to get our most recent term and we want <SearchHistory /> to get all of the terms that have been submitted. We can achieve this by creating a state in <App /> that stores an array of terms searched for. Then we can pass the entire array (as a prop, like an attribute) to the <SearchHistory /> component and the latest entry to the <SearchBar /> component. We also need to pass the setter method down to <SearchBar /> so that it can add new terms to the array.
+
+An important thing to notice with this - a child component can't pass state up to a parent BUT if the parent passes its setter method down to the child, the child can change the state in the parent using the parents setter method. It like a child having no money to buy something (state) but if a parent gives the child their credit card details (method to use/change money state of the parent) then the child can alter the parents money state, even though the child still doesn't have any money (state) of their own.
+
+No in <SearchHistory /> we can map through the array (remembering to give each a key) and return each term in the array as a list element
+
+    export default function SearchHistory(props) {
+        return (
+            <ul>
+            {props.terms.map((term) => (
+                <li key={term}>{term}</li>
+            ))}
+            </ul>
+        );
+    }
+
+Assuming we will add new terms to the beginning of our array we can pass the first item into <SearchBar /> from <App /> like so --> <SearchBar term={terms[0]} />. Then we access it with {props.term} inside <SearchBar />.
+
+Now on to adding new terms from a child component. We can't directly pass the state setter down, that has to be triggered in the component in which it is defined/where the state is. Instead we can call the setter in our own function and pass THAT down. Since we want to put the new term at the beginning we can use the spread operator to set a new array as the terms state with the new term at the beginning
+
+  function addTerm(term) {
+    setTerms([term, ...terms]);
+  }
+
+Now it's simply a matter of passing this function down to <SearchBar /> from <App /> (as a prop, like an attribute)
+
+    <SearchBar term={terms[0]} addTerm={addTerm} />
+
+And then going into the submitted function in <SearchBar /> and haveing it use this function there to change the state in <App />
+
+    export default function SearchBar(props) {
+        function submitted(ev) {
+            ev.preventDefault();
+            console.log("submitted");
+            props.addTerm(ev.target["keyword"].value);
+    }
+
+Notice this is similar ot what we did before when state was defined inside the <SearchBar /> component --> setTerm(ev.target["keyword"].value). Now, we are simply using a function from props to call a setter function living in another (higher/parent) Component.
+
+This is possible because in JavaScript functions are objects and can be passed around, used as arguments, used as varibles, just like anything else.
+
+Understanding that we want to keep state in a high function and pass it and a function that can use its setter down to child components as props is key to understanding the useState() Hook.
+

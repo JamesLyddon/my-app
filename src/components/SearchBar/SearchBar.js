@@ -4,6 +4,8 @@ export default function SearchBar(props) {
   function submitted(ev) {
     ev.preventDefault();
     console.log("submitted");
+    props.addTerm(ev.target["keyword"].value);
+    // setTerm(ev.target["keyword"].value);
   }
 
   function focused(ev) {
@@ -38,6 +40,7 @@ export default function SearchBar(props) {
           Search
         </button>
       </form>
+      {props.term ? <p>You searched for {props.term}</p> : ""}
     </section>
   );
 }
