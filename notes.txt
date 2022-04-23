@@ -439,3 +439,46 @@ This is possible because in JavaScript functions are objects and can be passed a
 
 Understanding that we want to keep state in a high function and pass it and a function that can use its setter down to child components as props is key to understanding the useState() Hook.
 
+
+---------------------------------------------------------------------------------------------------------
+06 Hooks & Use Effect
+---------------------------------------------------------------------------------------------------------
+
+
+A pure function in JavaScript is a function that is deterministic, that is, if you give it the same inupt you will always get the same output. It also means that it doesn't effect things outside of its scope, its effect is entirely contained within its scope.
+
+Things you wouldn't use a pure function for would be fetch calls or setting timers. These functions would necessaily have effects outside of their scope.
+
+useEffect is a Hook (magic method) that allows us to perform functions at certain points in the lifecycle of the App, or when objects we chose are altered.
+
+At its most basic useEffect() will take in a function to execute as a first argument and an array to object to 'watch' as its second argument. If we do not pass in a second argument at all, the function we pass in as the first argument will execute after EVERY RERENDER, exactly like componentDidUpdate from class based component lifecycle. If we pass in an empty array as the second argument, the function will be executed ONLY AFTER THE FIRST RENDER, just like componentDidMount.
+
+useEffect() is fundamentally a way to perform functions outside of the usual flow of the render.
+
+We import useEFfect() from React just like we did for useState() --> import {useEffect} from 'react';
+
+To summarise here are the 3 basic ways we can now use thise uesEffect() function we have access to:
+
+useEffect(()=>{}) --> run this function after first render and every rerender
+
+useEffect(() =>{}, []) --> run this function after the initial render only
+
+useEffect(() => {}, [count]) --> run this function whenever there is a change/rerender of count
+
+Here's an example of the 3 in use
+
+  useEffect(() => {
+    console.log("Initial render");
+  }, []);
+
+  useEffect(() => {
+    console.log("every render");
+  });
+
+  useEffect(() => {
+    console.log("terms has changed");
+  }, [terms]);
+
+!React.StrictMode will render each component twice so if you are console logging like this you will get some confusing duplications.
+
+useEffect is useful for fetch calls because we don't want to make them until after the initial render.

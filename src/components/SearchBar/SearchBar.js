@@ -3,22 +3,14 @@ import "./searchbar.css";
 export default function SearchBar(props) {
   function submitted(ev) {
     ev.preventDefault();
-    console.log("submitted");
     props.addTerm(ev.target["keyword"].value);
-    // setTerm(ev.target["keyword"].value);
   }
 
-  function focused(ev) {
-    console.log("onFocus");
-  }
+  function focused(ev) {}
 
-  function changed(ev) {
-    console.log("onInput", ev.target.value);
-  }
+  function changed(ev) {}
 
-  function clicked(ev) {
-    console.log("clicked");
-  }
+  function clicked(ev) {}
 
   return (
     <section className="searchBar">
