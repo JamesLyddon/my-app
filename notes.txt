@@ -502,5 +502,13 @@ As you can see we handle all of the asynchrouns data fetching, data conversion, 
 
 useState() and useEffect() are the two most common Hooks you will use in React. WIth them we can have stateful apps and execute code outside of the normal flow of rendering, or rather, useEffect() allows us to make use of the component lifecycle without needing to use class bases components.
 
+A couple of things to keep in mind:
 
+- Hooks must be used inside of your function component (before return)
+- useEffect() can call asynchronous functions but don't try to make useEffect an asynchronous function (can end up in an infinite loop)
+- 
 
+ 
+---------------------------------------------------------------------------------------------------------
+06 Hooks & Use Effect
+---------------------------------------------------------------------------------------------------------
