@@ -15,7 +15,6 @@ function App() {
   }
 
   useEffect(() => {
-    console.log("Initial render complete");
     fetchData("films");
   }, []);
 

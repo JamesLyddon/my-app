@@ -482,3 +482,25 @@ Here's an example of the 3 in use
 !React.StrictMode will render each component twice so if you are console logging like this you will get some confusing duplications.
 
 useEffect is useful for fetch calls because we don't want to make them until after the initial render.
+
+Here's an example of making using an asynchronous function to fetch data from the star wars api and firing it after the initial render using useEffect()
+
+  useEffect(() => {
+    console.log("Initial render complete");
+    fetchData("films");
+  }, []);
+
+  async function fetchData(type) {
+    let url = `https://swapi.dev/api/${type}`;
+    let resp = await fetch(url);
+    if (!resp.ok) throw new Error(resp.statusText);
+    let data = await resp.json();
+    setFilms(data.results);
+  }
+
+As you can see we handle all of the asynchrouns data fetching, data conversion, changing state in our async function then have it called after the initial render with useEffect(). This ensures there is no 'race' between rendering and data fetching taking place.
+
+useState() and useEffect() are the two most common Hooks you will use in React. WIth them we can have stateful apps and execute code outside of the normal flow of rendering, or rather, useEffect() allows us to make use of the component lifecycle without needing to use class bases components.
+
+
+

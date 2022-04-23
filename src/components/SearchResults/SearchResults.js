@@ -1,6 +1,17 @@
 import "./searchresults.css";
+import { useEffect } from "react";
+
 
 export default function SearchResults(props) {
+  
+  useEffect(()=>{
+    console.log('initial render only')
+  }, []);
+
+  useEffect(() => {
+    console.log('initial AND re-render of films')
+  }, [props.films])
+  
   return (
     <ul className="results">
       {props.films.map((film) => (
