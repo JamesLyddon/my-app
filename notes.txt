@@ -506,9 +506,93 @@ A couple of things to keep in mind:
 
 - Hooks must be used inside of your function component (before return)
 - useEffect() can call asynchronous functions but don't try to make useEffect an asynchronous function (can end up in an infinite loop)
-- 
+
+On final thing to know is useEffect can return something. This should be a function and it is called the CLEAN UP function. Basically, once the function you wanted to run with useEffect() has executed, the clean up function you define will run.
+
+    useEffect(() => {
+        fetchData(terms[0]);
+        
+        return ()=> {
+            //clean up function
+        }
+    }, [terms])
+
+The clean up function isn't always necessary but it can be useful if you want to reset or delete something after your primary useEffect function has fired.
 
  
 ---------------------------------------------------------------------------------------------------------
-06 Hooks & Use Effect
+08 Refactoring & App Strategy
 ---------------------------------------------------------------------------------------------------------
+
+In <SearchBar /> before we used a ternary to decided whether to return a result or and empty string
+ 
+    {props.term ? <p>You searched for {props.term}</p> : ""}
+
+The problem is the empty string is still being returned when ideally we simply want nothing to happen/be returned.
+
+Instead of a ternary, we can use LOGICAL SHORTCUTTING to only return an element if one exists, otherwise nothing will happen
+
+    {props.term && <p>You searched for {props.term}</p>}
+
+So if the first part of the expression is not true the expression will stop being evaluated and the flow will move on, ignoring code after &&
+
+Similarly, in <SearchBar /> we can use LOGICAL SHORTCUTTING to avoid adding empty items to our search history list. We do this in the submitted function so that the search term will never be added if the input is blank (falsey)
+
+  function submitted(ev) {
+    ev.preventDefault();
+    ev.target["keyword"].value && props.addTerm(ev.target["keyword"].value);
+  }
+
+Logical Shortcutting is kind of like a very stripped down if statement. For the first example we could have written
+
+    {props.term && <p>You searched for {props.term}</p>}
+
+    as
+
+    {if(props.term) return <p>You searched for {props.term}</p>}
+
+One problem we currently have is that our search history allows for duplicates. Each truthy term is added to the list even if it's already listed multiple times.
+
+One way to avoid this is to make use of the SET object.
+
+A Set is a collection of unique values. It is like an array, except each value can only feature ONCE.
+
+We can create a Set with the NEW keyword
+
+    let mySet = new Set('bill', 'bobby', 'dale')
+
+We can pass an array as an argument to Set() and the new Set object will have only unique items, refusing to add duplicates.
+
+Here's an example of 2 arrays with duplicate names both internally and shared between them. We can pass them into Set() as a single array by using the spread operator on both. This will then return a new object with all the unique items from both arrays
+
+    const myArr = ['bill', 'bob', 'bill', 'bill', 'bob']
+    const myArr2 = ['joe', 'pete', 'bill', 'bob']
+    const mySet = new Set([...myArr, ...myArr2])
+
+    console.log(mySet)
+        //{"bill","bob","joe","pete"}
+
+We can implement this to remove duplicated from our searchTerms by modifying the addTerm() function in <App />
+
+Instead of this
+
+  function addTerm(term) {
+    setTerms([term, ...terms]);
+  }
+
+  We can first make a Set from the updated terms array and use this to setTerms
+
+  function addTerm(term) {
+    let newTerms = new Set([term, ...terms])
+    setTerms(newTerms);
+  }
+
+There is one issue with this. Remember that our Set newTerms is an OBJECT not an ARRAY and our terms state is an array. To resolve this issue we can simply convery the newTerms set into an array where we are using it to setTerms
+
+  function addTerm(term) {
+    let newTerms = new Set([term, ...terms]);
+    setTerms(Array.from(newTerms));
+  }
+
+Now our searchResults will not include duplicates, however, if we do pass in a term that has already in the terms array it will jump to the front of the array which is exactly what we want. This is because if we look at 'new Set([term, ...terms]) the term is evaluated first and put at the first position of the Set(soon to be array) with the previous array of terms being evaluated after, therefore, it is the duplicate in previous array that does not get added to the Set, meaning the term effectively 'jumps back to the front of the queue/top of the stack'.
+

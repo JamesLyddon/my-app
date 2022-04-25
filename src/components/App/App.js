@@ -6,24 +6,29 @@ import SearchResults from "../SearchResults/SearchResults";
 import { useState, useEffect } from "react";
 
 function App() {
-  const name = "Company Name";
+  const name = "Star Wars Info";
   const [terms, setTerms] = useState([]);
-  const [films, setFilms] = useState([]);
+  const [results, setResults] = useState([]);
+  const [dataType, setDataType] = useState("films");
 
   function addTerm(term) {
-    setTerms([term, ...terms]);
+    let newTerms = new Set([term, ...terms]);
+    setTerms(Array.from(newTerms));
   }
 
   useEffect(() => {
-    fetchData("films");
-  }, []);
+    fetchData(terms[0]);
+  }, [terms]);
 
-  async function fetchData(type) {
-    let url = `https://swapi.dev/api/${type}`;
+  async function fetchData(keyword) {
+    let url = `https://swapi.dev/api/${dataType}`;
+    if (keyword) {
+      url += `/?search=${keyword}`;
+    }
     let resp = await fetch(url);
     if (!resp.ok) throw new Error(resp.statusText);
     let data = await resp.json();
-    setFilms(data.results);
+    setResults(data.results);
   }
 
   return (
@@ -32,7 +37,7 @@ function App() {
       <SearchBar term={terms[0]} addTerm={addTerm} />
       <main className="content">
         <SearchHistory terms={terms} />
-        <SearchResults films={films} />
+        <SearchResults results={results} type={dataType}/>
       </main>
     </div>
   );
