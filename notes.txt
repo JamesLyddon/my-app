@@ -596,3 +596,136 @@ There is one issue with this. Remember that our Set newTerms is an OBJECT not an
 
 Now our searchResults will not include duplicates, however, if we do pass in a term that has already in the terms array it will jump to the front of the array which is exactly what we want. This is because if we look at 'new Set([term, ...terms]) the term is evaluated first and put at the first position of the Set(soon to be array) with the previous array of terms being evaluated after, therefore, it is the duplicate in previous array that does not get added to the Set, meaning the term effectively 'jumps back to the front of the queue/top of the stack'.
 
+
+---------------------------------------------------------------------------------------------------------
+09 Routing
+---------------------------------------------------------------------------------------------------------
+
+So far we have been working with components and displaying them on our page by returning them as elements in our <App /> component (which index.js takes and inserts into the element with the id='root' in index.html). But what if we want to have a different set of components rendered to the page depending on the situation e.g. a login page, a contact page, a home page etc.
+
+With pure html/css/javascript we would simply have a seperate html file for each page and a link would tell the browser to load the desired html.
+
+In React we will do our routing with an additional library - REACT ROUTER DOM
+
+So far we have been making use of the REACT library. REACT ROUTER DOM is an additional library that will allow us to set up routing in our project.
+
+You can think of it kind of like a switch statement that will return certain components based on user activity e.g. clicking a nav link.
+
+Currently we're working on the local server port 3000
+
+    http://localhost:3000/
+
+If we add anything to the end of this url React will simply ignoring it and rerender the home package. The development server is ignoring any attempt at routing.
+
+To get started we need to add REACT ROUTER DOM to our project.
+
+    npm install react-router-dom
+
+Across our app there will be 4 components from 'react-router-dom' that we will need to use to implement routing
+
+    BROWSER ROUTER
+    Routes
+    ROUTE
+    LINK
+
+BROWSER ROUTER
+
+In src/index.js we import
+
+    import { BrowserRouter } from "react-router-dom";
+
+You can rename this and you'll often see
+
+    import { BrowserRouter as Router } from "react-router-dom";
+
+This is a component we are getting from the react router dom library and it gives up access to a CONTEXT API to access the routing from anywhere in our application. We'll come back to CONTEXT APIs later but basically we'll be able to access information about the current route from anywhere in the application (kind of like a global state for routes).
+
+We can now wrap our <App /> in src/index.js in this <BrowserRouter /> component or rather, render the <BrowserRouter /> component in index.html with our <App /> passed into it as a child.
+
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./components/App/App";
+import { BrowserRouter } from "react-router-dom";
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(
+    <BrowserRouter>
+        <App />
+    </BrowserRouter>
+    );
+
+If we run the app on local server and check the components in chrome dev tools we'll see that APP is no longer at the top, instead, there a 4 components wrapped around it
+
+    BrowserRouter
+        Router
+            Navigation.Provider
+                Location.Provider
+                    App
+                        Header etc...
+
+This is how we will have access to route info anywhere in our App.
+
+LINK
+
+Before we were using a Link component that we made. react-router-dom comes with its own that we will use
+
+    import {Link} from 'react-router-dom'
+
+Using this object we can provide the to="" attribute that will be the value of the route e.g. to="films" ==> http://localhost:3000/films
+
+Our Nav component now looks like this
+
+    import "./nav.css";
+    import { Link } from "react-router-dom";
+
+    export default function Nav() {
+    return (
+        <nav>
+            <Link to="/films">Films</Link>
+            <Link to="/people">People</Link>
+            <Link to="/planets">Planets</Link>
+        </nav>
+    );
+    }
+
+So now when we click these Link components in our page the url will change to reflect this, however, the page doesn't reload and nothing changes besides the url in the address bar.
+
+ROUTES & ROUTE
+
+Our app is set up to have a main component render our results, it is here we will use Routes and route.
+
+Routes is a parent component in which we can place multiple ROUTE components as children.
+
+ROUTE components have a path="" attribute that ties to the to="" attribute from Link, meaning that <Link to="/films">Films</Link> is connected to <Route path="/films"><Films /></Route>. As you can see from this example, the ROUTE component take our components as children and these are what will be rendered when a user clicks on the relevant Link; the user click on a Link that points to a Route and the Route inside the Routes returns its child components.
+
+    import "./main.css";
+    import { Routes, Route } from "react-router-dom";
+    import Home from "../Home/Home";
+    import Films from "../Films/Films";
+    import People from "../People/People";
+    import Planets from "../Planets/Planets";
+
+    export default function Main(props) {
+        return (
+            <div className="mainContent">
+                <Routes>
+                    <Route path="/films" element={<Films />} />
+                    <Route path="/people" element={<People />} />
+                    <Route path="/planets" element={<Planets />} />
+                    <Route path="/" element={<Home />} />
+                </Routes>
+            </div>
+        );
+    }
+
+As you can see it's a lot like a switch statement. It may be confusing that the different react-router-dom components are implemented across our app but remember we have access to a context API because our entire App is wrapped in BrowserRouter>Router>Navigation.Provider>Location.Provider.
+
+To summarise:
+
+    1. <BrowserRouter /> wraps around our <App /> in index.js
+    2. We use multiple <Link to="/example" /> components in our Navbar to give users a way to select routes
+    3. Whever we want the revelevant components to render we put ONE <Routes /> component with multiple <Route path="/example" element={<Example />} /> components to render/return the desired component/s
+
+The way the routes work is that the flow will go down the routes in Routes and return the first one that matches. Becuase of this we put the default case at the bottom and have it return out Home component, that is, if none of the Route components match the url then our App will always render the Home component.
+
