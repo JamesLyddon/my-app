@@ -727,5 +727,10 @@ To summarise:
     2. We use multiple <Link to="/example" /> components in our Navbar to give users a way to select routes
     3. Whever we want the revelevant components to render we put ONE <Routes /> component with multiple <Route path="/example" element={<Example />} /> components to render/return the desired component/s
 
-The way the routes work is that the flow will go down the routes in Routes and return the first one that matches. Becuase of this we put the default case at the bottom and have it return out Home component, that is, if none of the Route components match the url then our App will always render the Home component.
+The way the routes work is that the flow will go down the routes in Routes and return the first one that matches. Becuase of this we put the default case at the bottom and have it return out Home component, so that is there is no appended route it defaults to Home.
+
+
+---------------------------------------------------------------------------------------------------------
+10 Advanced 5Routing
+---------------------------------------------------------------------------------------------------------
 
