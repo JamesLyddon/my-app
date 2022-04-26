@@ -731,6 +731,14 @@ The way the routes work is that the flow will go down the routes in Routes and r
 
 
 ---------------------------------------------------------------------------------------------------------
-10 Advanced 5Routing
+10 Advanced Routing
+---------------------------------------------------------------------------------------------------------
+
+Dynamic routing - using Hooks and nested routes to render things optionally and also render multiple routes e.g. /people & /people/8
+
+Should go back and make some notes but need to check it hasn't changed
+
+---------------------------------------------------------------------------------------------------------
+11 Using Prop Types
 ---------------------------------------------------------------------------------------------------------
 
